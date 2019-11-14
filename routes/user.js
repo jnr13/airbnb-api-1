@@ -40,9 +40,17 @@ router.post("/sign_up", async (req, res) => {
 router.post("/log_in", async (req, res) => {
   const password = req.body.password;
   const email = req.body.email;
+  const username = req.body.username;
+
+  let filters = {};
+  if (email) {
+    filters.email = email;
+  } else {
+    filters["account.username"] = username; // Ici on met le chemin sous format string de la variable qu'on veut comparer
+  }
 
   try {
-    const user = await UserModel.findOne({ email: email });
+    const user = await UserModel.findOne(filters);
 
     const hash = SHA256(password + user.salt).toString(encBase64); // On melange le password et le salt et on les encrypt
     if (user.hash === hash) {
