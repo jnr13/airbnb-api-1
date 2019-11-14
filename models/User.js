@@ -8,7 +8,8 @@ const UserModel = mongoose.model("User", {
   email: String,
   token: String,
   hash: String,
-  salt: String
+  salt: String,
+  lastConnexion: Date
 });
 
 module.exports = UserModel;
