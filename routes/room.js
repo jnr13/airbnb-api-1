@@ -15,9 +15,17 @@ router.post("/publish", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+  const city = req.query.city;
+
+  let filters = {}; // Filtre a donner a find()
+  if (city) {
+    // Ici on crée une regular expression avec l'option "i" qui signifie insensitive
+    filters.city = new RegExp(city, "i");
+  }
+
   try {
-    const room = await RoomModel.find(); // On recupere les Rooms
-    return res.json(room); // On la renvoit au client
+    const rooms = await RoomModel.find(filters); // On recupere les Rooms
+    return res.json({ rooms: rooms, count: room.length }); // On les renvoit au client avec le nombre
   } catch (err) {
     return res.status(400).json({ error: err.message }); // Si il y a une erreur, on la renvoit
   }
