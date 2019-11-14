@@ -16,11 +16,25 @@ router.post("/publish", async (req, res) => {
 
 router.get("/", async (req, res) => {
   const city = req.query.city;
+  const priceMin = req.query.priceMin;
+  const priceMax = req.query.priceMax;
 
   let filters = {}; // Filtre a donner a find()
   if (city) {
     // Ici on crée une regular expression avec l'option "i" qui signifie insensitive
     filters.city = new RegExp(city, "i");
+  }
+
+  if (priceMin) {
+    filters.price = {};
+    // $gte signifi qu'on va recuperer que les produits avec un "price" >= req.query.priceMin
+    filters.price.$gte = priceMin;
+  }
+  if (priceMax) {
+    // Condition pour pas RE-creer l'objet filters.price
+    if (filters.price === undefined) filters.price = {};
+    // $lte signifi qu'on va recuperer que les produits avec un "price" <= req.query.priceMax
+    filters.price.$lte = priceMax;
   }
 
   try {
