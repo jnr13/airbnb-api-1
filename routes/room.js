@@ -14,6 +14,15 @@ router.post("/publish", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const room = await RoomModel.find(); // On recupere les Rooms
+    return res.json(room); // On la renvoit au client
+  } catch (err) {
+    return res.status(400).json({ error: err.message }); // Si il y a une erreur, on la renvoit
+  }
+});
+
 router.get("/:id", async (req, res) => {
   const roomId = req.params.id;
 
