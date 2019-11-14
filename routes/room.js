@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 
   try {
     const rooms = await RoomModel.find(filters); // On recupere les Rooms
-    return res.json({ rooms: rooms, count: room.length }); // On les renvoit au client avec le nombre
+    return res.json({ rooms: rooms, count: rooms.length }); // On les renvoit au client avec le nombre
   } catch (err) {
     return res.status(400).json({ error: err.message }); // Si il y a une erreur, on la renvoit
   }
