@@ -47,8 +47,12 @@ router.post("/log_in", async (req, res) => {
     const hash = SHA256(password + user.salt).toString(encBase64); // On melange le password et le salt et on les encrypt
     if (user.hash === hash) {
       user.token = uid2(16); // On genere une chaine de caractere de taille 16
+      user.lastConnexion = Date.now();
+
       await user.save();
-      return res.json(_.pick(user, ["_id", "token", "account"])); // On renvoit une selection de key au client
+      return res.json(
+        _.pick(user, ["_id", "token", "account", "lastConnexion"])
+      ); // On renvoit une selection de key au client
     }
   } catch (err) {
     return res.status(400).json({ error: err.message }); // Si il y a une erreur, on la renvoit
@@ -68,16 +72,30 @@ router.get("/:id", async (req, res) => {
 
   try {
     const userSrc = await UserModel.findOne({ token: token.split(" ")[1] }); // Split pour enlever le "Bearer "
+    // On transforme la date en format timestamps (nbr de milisecond depuis 1970-xx-xx)
+    const lastConnexion = Date.parse(userSrc.lastConnexion);
+    // On recupere la date de maintenant en timestamps
+    const currentDate = Date.now();
+    // On regarde si ca n'a pas depassé 10sec (ou 10.000 ms)
+    if (currentDate - lastConnexion > 10000) {
+      return res.status(401).json({
+        error: {
+          message: "Token outdated"
+        }
+      });
+    }
     if (userSrc) {
       const user = await UserModel.findById(userId);
-      return res.json(_.pick(user, ["_id", "account"])); // On renvoit une selection de key au client
+      return res.json(_.pick(user, ["_id", "account", "lastConnexion"])); // On renvoit une selection de key au client
     }
     return res.status(401).json({
       error: {
         message: "Invalid token"
       }
     });
-  } catch (err) {}
+  } catch (err) {
+    return res.status(400).json({ error: err.message }); // Si il y a une erreur, on la renvoit
+  }
 });
 
 module.exports = router;
