@@ -11,6 +11,9 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true
 });
 
+const routes = require("./routes");
+app.use(routes);
+
 app.listen(process.env.PORT, function() {
   console.log("Server started");
 });

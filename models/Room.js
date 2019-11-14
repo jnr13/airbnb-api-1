@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
 const RoomModel = mongoose.model("Room", {
-  title: String,
+  title: {
+    type: String,
+    required: true
+  },
   description: String,
   photos: [String],
   price: Number,
